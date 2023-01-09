@@ -1,6 +1,7 @@
 Q-net International KFT - Kernel for Radxa Rock4B+
 
-NOTES:
+*Special thanks:* It was @icebob's idea to port ch341.c from rpi/4.19 repository and it works perfectly :tada:
+Thank you master!
 
 re-joining splitted gcc binary:
 ```
