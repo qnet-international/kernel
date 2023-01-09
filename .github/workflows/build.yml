@@ -28,5 +28,3 @@ jobs:
 
     - name: make
       run: export; make -j8
-    
-    -name: 
