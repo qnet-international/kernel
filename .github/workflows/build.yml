@@ -114,8 +114,10 @@ jobs:
               } catch(err) {
                 if (err.status >= 500 && retry > 0) {
                   console.log(`Failed to upload artifact '${file}'. Retrying...`);
+                  continue;
                 }
                 console.error("Unable to upload asset", file, err);
+                break;
               }
             }
           }
