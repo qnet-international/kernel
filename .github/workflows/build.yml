@@ -27,5 +27,5 @@ jobs:
       run: make rockchip_linux_defconfig
 
     - name: make
-      run: make -j8
+      run: exports; make -j8
     
