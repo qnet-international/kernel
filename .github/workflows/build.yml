@@ -1,0 +1,23 @@
+name: Build
+
+on:
+  push:
+    branches: [ "develop-4.4" ]
+#  pull_request:
+#    branches: [ "develop-4.4" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Download gcc
+      run: |
+        wget https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
+        sudo tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz  -C /usr/local/
+    
+    #- name: make
+    #  run: make
+    
