@@ -19,10 +19,21 @@ jobs:
         wget https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
         sudo tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz  -C /usr/local/
     
-    - name: Set environment
+    - name: Make
       run: |
         export ARCH=arm64
         export CROSS_COMPILE=/usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
         export
         make rockchip_linux_defconfig
         make -j8
+
+    - name: Create debs
+      run: |
+        export build_id=$(date +%Y%m%d_%H%M%S)
+        export lv="-$build_id-rockchip"
+        export kv=$(make kernelversion)
+        export debv="$kv$lv"
+        make  bindeb-pkg -j8    LOCALVERSION=$lv    KDEB_PKGVERSION=$debv
+
+    - name: Check debs
+      run: ls -al ../*.deb
