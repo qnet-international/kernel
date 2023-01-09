@@ -13,6 +13,7 @@ jobs:
     env:
       ARCH: arm64
       CROSS_COMPILE: "/usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-"
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 
     steps:
     - run: uname -a
