@@ -9,10 +9,8 @@ $ cat gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnuaa.* > gcc-linaro-7.3.1-2
 
 
 
-
-
-FROM FORK:
-
+From fork:
+```
         Linux kernel release 4.x <http://kernel.org/>
 
 These are the release notes for Linux version 4.  Read them carefully,
@@ -417,3 +415,4 @@ IF SOMETHING GOES WRONG:
    gdb'ing a non-running kernel currently fails because gdb (wrongly)
    disregards the starting offset for which the kernel is compiled.
 
+```
