@@ -43,7 +43,7 @@ jobs:
       run: ls -al ../*.deb
 
     - name: Create zip
-      run: export; zip dist/kernel-$build_id.zip ../*.deb; ls -al dist/
+      run: export; mkdir dist; zip dist/kernel-$build_id.zip ../*.deb; ls -al dist/
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
