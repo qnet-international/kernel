@@ -1,3 +1,18 @@
+Q-net International KFT - Kernel for Radxa Rock4B+
+
+NOTES:
+
+re-joining splitted gcc binary:
+```
+$ cat gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnuaa.* > gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnuaa.tar.xz
+```
+
+
+
+
+
+FROM FORK:
+
         Linux kernel release 4.x <http://kernel.org/>
 
 These are the release notes for Linux version 4.  Read them carefully,
