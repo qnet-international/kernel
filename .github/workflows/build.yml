@@ -1,0 +1,126 @@
+name: Build
+
+on:
+  push:
+    branches: [ "release-4.4-rockpi4" ]
+#  pull_request:
+#    branches: [ "develop-4.4" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    env:
+      ARCH: arm64
+      CROSS_COMPILE: "/usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-"
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
+
+    steps:
+    - run: uname -a
+    - uses: actions/checkout@v3
+    - name: Download gcc
+      run: | 
+        wget https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
+        sudo tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz  -C /usr/local/
+    
+    - name: Make
+      run: |
+        export
+        make rockchip_linux_defconfig
+        make -j8
+
+#export build_id=$(date +%Y%m%d-%H%M%S)
+    - name: Create debs
+      run: |
+        export build_id=99999
+        echo "::set-env name=build_id::$build_id"
+
+        export lv="-$build_id-rockchip"
+        export kv=$(make kernelversion)
+        export debv="$kv$lv"
+        make  bindeb-pkg -j8    LOCALVERSION=$lv    KDEB_PKGVERSION=$debv
+
+    - name: Check debs
+      run: ls -al ../*.deb
+
+    - name: Create zip
+      run: export; mkdir dist; zip -j dist/kernel-$build_id.zip ../*.deb; ls -al dist/
+
+    # - name: Upload artifacts
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: kernel
+    #     path: dist      
+
+    - name: Upload Release Assets
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{secrets.GH_TOKEN}}
+        script: |
+          // Example codes: https://github.com/ncipollo/release-action/blob/main/src/Releases.ts
+          //console.log('environment', process.versions, process.env);
+
+          const fs = require('fs').promises;
+
+          //console.log("context:", context);
+          const { repo: { owner, repo }, sha } = context;
+          const release_id = 88294537; // "Unreleased"
+
+          /*
+          //console.log({ owner, repo, sha });
+          const release = await github.repos.createRelease({
+            owner, repo,
+            tag_name: process.env.GITHUB_REF,
+            draft: true,
+            target_commitish: sha
+          });
+
+          // if (process.env.GITHUB_REF == "refs/heads/master") Use "Unreleased", else create new release
+
+          //console.log('created release', { release });
+          */
+
+          // https://api.github.com/repos/moleculerjs/sidecar/releases/35727994/assets
+          const listExistingArtifacts = (await github.repos.listReleaseAssets({
+            owner,
+            repo,
+            release_id,
+          })).data;
+
+          for (let file of await fs.readdir('./dist')) {
+            if ([".", ".."].includes(file)) continue;
+
+            const found = listExistingArtifacts.find(item => item.name == file);
+            if (found) {
+              console.log('Deleting previous', file, "...");
+              await github.repos.deleteReleaseAsset({
+                asset_id: found.id,
+                owner,
+                repo
+              });
+            }
+
+            console.log(`Uploading '${file}'...`);
+            let retry = 3;
+            while (retry++ > 0) {
+              try {
+                await github.repos.uploadReleaseAsset({
+                  owner, repo,
+                  release_id,
+                  name: file,
+                  data: await fs.readFile(`./dist/${file}`)
+                });
+                console.log(`Uploaded '${file}'.`);
+                break;
+              } catch(err) {
+                if (err.status >= 500 && retry > 0) {
+                  console.log(`Failed to upload artifact '${file}'. Retrying...`);
+                  continue;
+                }
+                console.error("Unable to upload asset", file, err);
+                break;
+              }
+            }
+          }
+
+          console.log("Done.");    
