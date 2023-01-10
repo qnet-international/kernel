@@ -29,10 +29,9 @@ jobs:
         make rockchip_linux_defconfig
         make -j8
 
-#export build_id=$(date +%Y%m%d-%H%M%S)
     - name: Create debs
       run: |
-        export build_id=99999
+        export build_id=$(date +%Y%m%d-%H%M%S)
         echo "::set-env name=build_id::$build_id"
 
         export lv="-$build_id-rockchip"
