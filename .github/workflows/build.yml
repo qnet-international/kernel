@@ -87,7 +87,10 @@ jobs:
           })).data;
 
           const sixMonth = 6 * 30 * 24 * 60 * 60 * 1000;
-          let oldAssets = listExistingArtifacts.find(item =>  (new Date(item.created_at).getTime()+sixMonth) >= new Date().getTime());
+          // Csak tesztre
+          const oneHour = 60 * 60 * 1000;
+
+          let oldAssets = listExistingArtifacts.find(item =>  (new Date(item.created_at).getTime()+oneHour>= new Date().getTime());
           console.log("Old Assets size:", oldAssets.length);
 
           for (let a of oldAssets) {
