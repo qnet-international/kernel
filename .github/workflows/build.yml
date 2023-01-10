@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ "release-4.4-rockpi4" ]
+    branches: [ "develop-4.4" ]
 #  pull_request:
 #    branches: [ "develop-4.4" ]
 
