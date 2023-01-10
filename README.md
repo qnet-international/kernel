@@ -1,4 +1,108 @@
-        Linux kernel release 4.x <http://kernel.org/>
+Q-net International KFT - Kernel for Radxa Rock4B+
+
+*Special thanks:* It was [@icebob](https://github.com/icebob)'s idea to port ch341.c from rpi/4.19 repository and it works perfectly :tada: 
+Thank you master!
+
+re-joining splitted gcc binary:
+```
+$ cat gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnuaa.* > gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnuaa.tar.xz
+```
+Usage:
+```
+# /usr/local 10-20GB space needed!
+ 
+# NOTE: If link broken use gcc from source, describe above.
+wget https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
+sudo tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz  -C /usr/local/
+
+Get the kernel source
+# NOTE private repo with https doesnt work for commits! git@github.com:qnet-international/kernel.git
+git clone -b release-4.4-rockpi4 https://github.com/qnet-international/kernel
+cd kernel
+
+export ARCH=arm64
+export CROSS_COMPILE=/usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+ 
+cd kernel
+make rockchip_linux_defconfig
+make menuconfig
+
+# RTC NOTES:
+# Device Drivers --> RTC --> DS1307 (=DS3231 driver)
+# Device Drivers --> Common RTC --> disable built-in rk808
+# Device Drivers --> RTC --> Default rtc0 -> rtc1
+
+# CH341 driver NOTES:
+# Device Drivers --> USB Support --> USB Serial Converter support --> USB_SERIAL_CH341 [=m]
+
+# SAVE, EXIT
+
+make -j8
+ 
+<some time..>
+ 
+export build_id="9999"   # make sure it's big enough so that our kernel is the newest.
+export lv="-$build_id-rockchip"
+export kv=$(make kernelversion)
+export debv="$kv$lv"
+ 
+make  bindeb-pkg -j8    LOCALVERSION=$lv    KDEB_PKGVERSION=$debv
+
+<some time..>
+ 
+ls ../*.deb
+../linux-firmware-image-4.4.154-9999-rockchip-g8b7b311_4.4.154-999-rockchip_all.deb
+../linux-headers-4.4.154-9999-rockchip-g8b7b311_4.4.154-999-rockchip_all.deb
+../linux-image-4.4.154-9999-rockchip-g8b7b311_4.4.154-999-rockchip_all.deb
+../linux-image-4.4.154-9999-rockchip-g8b7b311-dbg_4.4.154-999-rockchip_all.deb
+../linux-libc-dev_4.4.154-9999-rockchip_all.deb
+ 
+
+zip kernel_{$build_id}.zip *.deb 
+
+COPY TO TARGET:
+
+scp kernel_{$build_id}.zip rock@192.168.51.30:/home/rock/kernel_6969.zip
+ 
+On target machine:
+
+unzip kernel_9999.zip -d kernel_9999
+cd kernel_9999
+ls
+ 
+# Install!
+dpkg -i *.deb
+<some time..>
+
+cat /boot/extlinux/extlinux.conf
+        timeout 10
+        menu title select kernel
+ 
+        label kernel-4.4.154-6969-rockchip-00040-g86a614bc15b3               
+            kernel /vmlinuz-4.4.154-6969-rockchip-00040-g86a614bc15b3
+            initrd /initrd.img-4.4.154-6969-rockchip-00040-g86a614bc15b3
+            devicetreedir /dtbs/4.4.154-6969-rockchip-00040-g86a614bc15b3
+            append earlyprintk console=ttyFIQ0,1500000n8 rw init=/sbin/init rootfstype=ext4 rootwait  root=UUID=bf4cae21-9d47-4a39-8024-72b7df68be81 console=ttyS2,1500000n8 # <---- UUID!!
+ 
+        label kernel-4.4.154-116-rockchip-g86a614bc15b3
+            kernel /vmlinuz-4.4.154-116-rockchip-g86a614bc15b3
+            initrd /initrd.img-4.4.154-116-rockchip-g86a614bc15b3
+            devicetreedir /dtbs/4.4.154-116-rockchip-g86a614bc15b3
+            append earlyprintk console=ttyFIQ0,1500000n8 rw init=/sbin/init rootfstype=ext4 rootwait  root=UUID=bf4cae21-9d47-4a39-8024-72b7df68be81 console=ttyS2,1500000n8
+
+sudo reboot
+
+DONE!
+
+rock@rockpi-4b:~$ uname -a
+Linux rockpi-4b 4.4.154-9999-rockchip-00040-g86a614bc15b3 #2 SMP Thu Dec 15 09:10:16 UTC 2022 aarch64 GNU/Linux
+
+```
+legacy from fork:
+
+```
+
+              Linux kernel release 4.x <http://kernel.org/>
 
 These are the release notes for Linux version 4.  Read them carefully,
 as they tell you what this is all about, explain how to install the
@@ -402,3 +506,4 @@ IF SOMETHING GOES WRONG:
    gdb'ing a non-running kernel currently fails because gdb (wrongly)
    disregards the starting offset for which the kernel is compiled.
 
+```
