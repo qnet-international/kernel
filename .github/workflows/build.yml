@@ -60,7 +60,7 @@ jobs:
 
           // Maradék törölhető
           if(listTodayArtifacts && listTodayArtifacts.length > 0){
-            for (let deleteItem of deleteableArtifacts) {
+            for (let deleteItem of listTodayArtifacts) {
               console.log("DELETE Name: ", item.name);
               console.log("DELETE Created_1:", item.created_at);
             }
