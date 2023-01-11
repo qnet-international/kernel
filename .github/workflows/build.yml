@@ -94,8 +94,8 @@ jobs:
 
                // Delete
               for (let deleteItem of oldArtifacts) {
-                console.log("Name: ", item.name);
-                console.log("Created_1:", item.created_at);
+                console.log("Name: ", deleteItem.name);
+                console.log("Created_1:", deleteItem.created_at);
               }
           }
 
