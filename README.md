@@ -28,9 +28,9 @@ make rockchip_linux_defconfig
 make menuconfig
 
 # RTC NOTES:
-# Device Drivers --> RTC --> DS1307 (=DS3231 driver)
-# Device Drivers --> Common RTC --> disable built-in rk808
-# Device Drivers --> RTC --> Default rtc0 -> rtc1
+# Device Drivers --> Real Time Clock --> Dallas/Maxim DS1307/37.. (=DS3231 driver)
+# Device Drivers --> Common RTC --> disable built-in rk808 # nem lesz wifi!! kihagyható
+# Device Drivers --> Real Time Clock --> Default rtc0 -> rtc1
 
 # CH341 driver NOTES:
 # Device Drivers --> USB Support --> USB Serial Converter support --> USB_SERIAL_CH341 [=m]
