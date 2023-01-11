@@ -53,10 +53,10 @@ jobs:
 
           console.log("Maiak:", listTodayArtifacts);
 
-          // Dátum szerinti fordított rendezés
+          // Dátum szerinti rendezés
           if(listTodayArtifacts && listTodayArtifacts.length > 1){
             listTodayArtifacts.sort((a, b) => {
-                return b.created_at - a.created_at;
+                return a.created_at - b.created_at;
             });
           }
 
@@ -88,10 +88,10 @@ jobs:
 
           console.log("regebbi: ", oldArtifacts);
 
-          // Rendezzük fordított sorrendben
+          // Rendezzük
           if(oldArtifacts && oldArtifacts.length > 1){
             oldArtifacts.sort((a, b) => {
-                return b.created_at - a.created_at;
+                return a.created_at - b.created_at;
             });
           }
 
