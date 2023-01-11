@@ -51,7 +51,6 @@ jobs:
     #     name: kernel
     #     path: dist      
 
-    steps:
     - name: Upload Release Assets
       uses: actions/github-script@v3
       with:
