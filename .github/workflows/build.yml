@@ -68,6 +68,11 @@ jobs:
             for (let deleteItem of listTodayArtifacts) {
               console.log("DELETE Name: ", deleteItem.name);
               console.log("DELETE Created_1:", deleteItem.created_at);
+              //await github.repos.deleteReleaseAsset({
+              //  asset_id: deleteItem.id,
+              //  owner,
+              //  repo
+              //});
             }
           }
 
@@ -86,7 +91,7 @@ jobs:
             });
           }
 
-          console.log("regebbi: ", oldArtifacts);
+          console.log("törölhető: ", oldArtifacts);
 
           // Rendezzük
           if(oldArtifacts && oldArtifacts.length > 1){
@@ -103,9 +108,40 @@ jobs:
               for (let deleteItem of oldArtifacts) {
                 console.log("Name: ", deleteItem.name);
                 console.log("Created_1:", deleteItem.created_at);
+                //await github.repos.deleteReleaseAsset({
+                //  asset_id: deleteItem.id,
+                //  owner,
+                //  repo
+                //});
               }
           }
 
           // --- FELTÖLTÉS ---
+
+          for (let file of await fs.readdir('./dist')) {
+            if ([".", ".."].includes(file)) continue;
+
+            console.log(`Uploading '${file}'...`);
+            let retry = 3;
+            while (retry++ > 0) {
+              try {
+                await github.repos.uploadReleaseAsset({
+                  owner, repo,
+                  release_id,
+                  name: file,
+                  data: await fs.readFile(`./dist/${file}`)
+                });
+                console.log(`Uploaded '${file}'.`);
+                break;
+              } catch(err) {
+                if (err.status >= 500 && retry > 0) {
+                  console.log(`Failed to upload artifact '${file}'. Retrying...`);
+                  continue;
+                }
+                console.error("Unable to upload asset", file, err);
+                break;
+              }
+            }
+          }
 
           console.log("Done.");    
