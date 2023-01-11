@@ -24,6 +24,7 @@ jobs:
           const fs = require('fs').promises;
           const { repo: { owner, repo }, sha } = context;
           const release_id = 88294537; // "Unreleased"
+          const today = new Date();
 
           const listExistingArtifacts = (await github.repos.listReleaseAssets({
             owner,
@@ -36,7 +37,6 @@ jobs:
 
           // Mai nap feltöltöttek törölhetőek, 1 maradjon meg
           let listTodayArtifacts = listExistingArtifacts;
-          const today = new Date();
 
           // Maiak kiszedése
           if(listTodayArtifacts && listTodayArtifacts.length > 1){
@@ -61,8 +61,8 @@ jobs:
           // Maradék törölhető
           if(listTodayArtifacts && listTodayArtifacts.length > 0){
             for (let deleteItem of listTodayArtifacts) {
-              console.log("DELETE Name: ", item.name);
-              console.log("DELETE Created_1:", item.created_at);
+              console.log("DELETE Name: ", deleteItem.name);
+              console.log("DELETE Created_1:", deleteItem.created_at);
             }
           }
 
