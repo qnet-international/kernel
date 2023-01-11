@@ -39,10 +39,10 @@ jobs:
           let oldAssets = listExistingArtifacts;
           console.log("Old Assets size:", oldAssets.length);
 
-          for (let a of oldAssets) {
+          for (let item of oldAssets) {
             console.log("-----------------------")
-            console.log("Name: ", a.name);
-            console.log("Created:", a.created_at);
+            console.log("Name: ", item.name);
+            console.log("Created:", item.created_at);
             console.log("Noew:", new Date().getTime());
             console.log("OLD?:",  (new Date(item.created_at).getTime()+oneHour>= new Date().getTime()));
             console.log("-----------------------")
