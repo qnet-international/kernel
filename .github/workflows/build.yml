@@ -31,24 +31,74 @@ jobs:
             release_id,
           })).data;
 
-          const sixMonth = 6 * 30 * 24 * 60 * 60 * 1000;
-          // Csak tesztre
-          const oneHour = 60 * 60 * 1000;
+          // --- MAIAK TÖRLÉSE (UTOLSÓ KIVÉTELÉVEL) ---
+          console.log("TODAY DELETE");
 
-          //let oldAssets = listExistingArtifacts.find(item =>  (new Date(item.created_at).getTime()+oneHour>= new Date().getTime()));
-          let oldAssets = listExistingArtifacts;
-          console.log("Old Assets size:", oldAssets.length);
+          // Mai nap feltöltöttek törölhetőek, 1 maradjon meg
+          let listTodayArtifacts = listExistingArtifacts;
+          const today = new Date();
 
-          for (let item of oldAssets) {
-            console.log("-----------------------")
-            console.log("Name: ", item.name);
-            console.log("Created_1:", item.created_at);
-            console.log("Created_2:", new Date(item.created_at).getTime());
-            console.log("Now:", new Date());
-            console.log("Now:", new Date().getTime());
-            console.log("NOW-ITEM_TIME:", (new Date().getTime()- new Date(item.created_at).getTime()))
-            console.log("OLD?:",  (new Date(item.created_at).getTime()+oneHour>= new Date().getTime()));
-            console.log("-----------------------")
+          // Maiak kiszedése
+          if(listTodayArtifacts && listTodayArtifacts.length > 1){
+            listTodayArtifacts.find(item => {
+                itemDate = new Date(item.created_at);
+                return itemDate.getDate() === today.getDate() && 
+                  itemDate.getMonth() === today.getMonth() && 
+                  itemDate.getFullYear() === today.getFullYear();
+            });
           }
+
+          // Dátum szerinti fordított rendezés
+          if(listTodayArtifacts && listTodayArtifacts.length > 1){
+            listTodayArtifacts.sort((a, b) => {
+                return b.created_at - a.created_at;
+            });
+          }
+
+          // Levágjuk a legfrisebb 1 db-ot, az maradjon meg mint latest előtti.
+          if(listTodayArtifacts && listTodayArtifacts.length > 0)listTodayArtifacts.length = (listTodayArtifacts.length - 1);
+
+          // Maradék törölhető
+          if(listTodayArtifacts && listTodayArtifacts.length > 0){
+            for (let deleteItem of deleteableArtifacts) {
+              console.log("DELETE Name: ", item.name);
+              console.log("DELETE Created_1:", item.created_at);
+            }
+          }
+
+          // --- RÉGIEK TÖRLÉSE ---
+          console.log("OLD DELETE");
+
+          let oldArtifacts = listExistingArtifacts;
+
+          // Régebbi mint maiak kiszedése
+          if(oldArtifacts && oldArtifacts.length > 1){
+            oldArtifacts.find(item => {
+                itemDate = new Date(item.created_at);
+                return itemDate.getDate() !== today.getDate() && 
+                  itemDate.getMonth() !== today.getMonth() && 
+                  itemDate.getFullYear() !== today.getFullYear();
+            });
+          }
+
+          // Rendezzük fordított sorrendben
+          if(oldArtifacts && oldArtifacts.length > 1){
+            oldArtifacts.sort((a, b) => {
+                return b.created_at - a.created_at;
+            });
+          }
+
+          // Ha több mint 3 régi van, akkor kitöröljük őket..
+          if(oldArtifacts && oldArtifacts.length > 3) {
+              deleteableArtifacts.length = 3;
+
+               // Delete
+              for (let deleteItem of deleteableArtifacts) {
+                console.log("Name: ", item.name);
+                console.log("Created_1:", item.created_at);
+              }
+          }
+
+          // --- FELTÖLTÉS ---
 
           console.log("Done.");    
