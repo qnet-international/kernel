@@ -26,6 +26,9 @@ jobs:
           const release_id = 88294537; // "Unreleased"
           const today = new Date();
 
+          // Nem maiak közül ennyit tartson meg
+          const KEEP_OLD = 3;
+
           const listExistingArtifacts = (await github.repos.listReleaseAssets({
             owner,
             repo,
@@ -47,6 +50,8 @@ jobs:
                   itemDate.getFullYear() === today.getFullYear();
             });
           }
+
+          console.log("Maiak:", listTodayArtifacts.length);
 
           // Dátum szerinti fordított rendezés
           if(listTodayArtifacts && listTodayArtifacts.length > 1){
@@ -81,6 +86,8 @@ jobs:
             });
           }
 
+          console.log("regebbi: ", oldArtifacts.length);
+
           // Rendezzük fordított sorrendben
           if(oldArtifacts && oldArtifacts.length > 1){
             oldArtifacts.sort((a, b) => {
@@ -90,7 +97,7 @@ jobs:
 
           // Ha több mint 3 régi van, akkor kitöröljük őket..
           if(oldArtifacts && oldArtifacts.length > 3) {
-              oldArtifacts.length = 3;
+              oldArtifacts.length = KEEP_OLD;
 
                // Delete
               for (let deleteItem of oldArtifacts) {
