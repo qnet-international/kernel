@@ -42,8 +42,11 @@ jobs:
           for (let item of oldAssets) {
             console.log("-----------------------")
             console.log("Name: ", item.name);
-            console.log("Created:", item.created_at);
-            console.log("Noew:", new Date().getTime());
+            console.log("Created_1:", item.created_at);
+            console.log("Created_2:", new Date(item.created_at).getTime());
+            console.log("Now:", new Date());
+            console.log("Now:", new Date().getTime());
+            console.log("NOW-ITEM_TIME:", (new Date().getTime()- new Date(item.created_at).getTime()))
             console.log("OLD?:",  (new Date(item.created_at).getTime()+oneHour>= new Date().getTime()));
             console.log("-----------------------")
           }
