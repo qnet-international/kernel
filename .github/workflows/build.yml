@@ -16,6 +16,42 @@ jobs:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 
     steps:
+    - run: uname -a
+    - uses: actions/checkout@v3
+    - name: Download gcc
+      run: | 
+        wget https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz
+        sudo tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz  -C /usr/local/
+    
+    - name: Make
+      run: |
+        export
+        make rockchip_linux_defconfig
+        make -j8
+
+    - name: Create debs
+      run: |
+        export build_id=$(date +%Y%m%d-%H%M%S)
+        echo "::set-env name=build_id::$build_id"
+
+        export lv="-$build_id-rockchip"
+        export kv=$(make kernelversion)
+        export debv="$kv$lv"
+        make  bindeb-pkg -j8    LOCALVERSION=$lv    KDEB_PKGVERSION=$debv
+
+    - name: Check debs
+      run: ls -al ../*.deb
+
+    - name: Create zip
+      run: export; mkdir dist; zip -j dist/kernel-$build_id.zip ../*.deb; ls -al dist/
+
+    # - name: Upload artifacts
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: kernel
+    #     path: dist      
+
+    steps:
     - name: Upload Release Assets
       uses: actions/github-script@v3
       with:
