@@ -90,10 +90,10 @@ jobs:
 
           // Ha több mint 3 régi van, akkor kitöröljük őket..
           if(oldArtifacts && oldArtifacts.length > 3) {
-              deleteableArtifacts.length = 3;
+              oldArtifacts.length = 3;
 
                // Delete
-              for (let deleteItem of deleteableArtifacts) {
+              for (let deleteItem of oldArtifacts) {
                 console.log("Name: ", item.name);
                 console.log("Created_1:", item.created_at);
               }
