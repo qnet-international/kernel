@@ -12,6 +12,7 @@
 .*
 !.config
 !.github
+!.scmversion
 *.o
 *.o.*
 *.a
