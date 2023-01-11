@@ -35,29 +35,17 @@ jobs:
           // Csak tesztre
           const oneHour = 60 * 60 * 1000;
 
-          let oldAssets = listExistingArtifacts.find(item =>  (new Date(item.created_at).getTime()+oneHour>= new Date().getTime()));
-          //let oldAssets = listExistingArtifacts;
+          //let oldAssets = listExistingArtifacts.find(item =>  (new Date(item.created_at).getTime()+oneHour>= new Date().getTime()));
+          let oldAssets = listExistingArtifacts;
           console.log("Old Assets size:", oldAssets.length);
 
           for (let a of oldAssets) {
             console.log("-----------------------")
             console.log("Name: ", a.name);
             console.log("Created:", a.created_at);
+            console.log("Noew:", new Date().getTime());
+            console.log("OLD?:",  (new Date(item.created_at).getTime()+oneHour>= new Date().getTime()));
             console.log("-----------------------")
-          }
-
-          for (let file of await fs.readdir('./dist')) {
-            if ([".", ".."].includes(file)) continue;
-
-            const found = listExistingArtifacts.find(item => item.name == file);
-            if (found) {
-              console.log('MOCK Deleting previous', file, "...");
-             // await github.repos.deleteReleaseAsset({
-              //  asset_id: found.id,
-              //  owner,
-              //  repo
-             // });
-            }
           }
 
           console.log("Done.");    
