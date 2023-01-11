@@ -51,7 +51,7 @@ jobs:
             });
           }
 
-          console.log("Maiak:", listTodayArtifacts.length);
+          console.log("Maiak:", listTodayArtifacts);
 
           // Dátum szerinti fordított rendezés
           if(listTodayArtifacts && listTodayArtifacts.length > 1){
@@ -86,7 +86,7 @@ jobs:
             });
           }
 
-          console.log("regebbi: ", oldArtifacts.length);
+          console.log("regebbi: ", oldArtifacts);
 
           // Rendezzük fordított sorrendben
           if(oldArtifacts && oldArtifacts.length > 1){
