@@ -62,7 +62,7 @@ jobs:
           const today = new Date();
 
           // Nem maiak közül ennyit tartson meg
-          const KEEP_OLD = 3;
+          const KEEP_OLD = 5;
 
           const listExistingArtifacts = (await github.repos.listReleaseAssets({
             owner,
@@ -86,7 +86,7 @@ jobs:
             });
           }
 
-          console.log("Maiak:", listTodayArtifacts);
+          // console.log("Maiak:", listTodayArtifacts);
 
           // Dátum szerinti rendezés
           if(listTodayArtifacts && listTodayArtifacts.length > 1){
@@ -102,17 +102,17 @@ jobs:
           if(listTodayArtifacts && listTodayArtifacts.length > 0){
             for (let deleteItem of listTodayArtifacts) {
               console.log("DELETE Name: ", deleteItem.name);
-              console.log("DELETE Created_1:", deleteItem.created_at);
-              //await github.repos.deleteReleaseAsset({
-              //  asset_id: deleteItem.id,
-              //  owner,
-              //  repo
-              //});
+              //console.log("DELETE Created_1:", deleteItem.created_at);
+              await github.repos.deleteReleaseAsset({
+                asset_id: deleteItem.id,
+                owner,
+                repo
+              });
             }
           }
 
           // --- RÉGIEK TÖRLÉSE ---
-          console.log("OLD DELETE");
+         console.log("OLD DELETE");
 
           let oldArtifacts = listExistingArtifacts;
 
@@ -126,8 +126,6 @@ jobs:
             });
           }
 
-          console.log("törölhető: ", oldArtifacts);
-
           // Rendezzük
           if(oldArtifacts && oldArtifacts.length > 1){
             oldArtifacts.sort((a, b) => {
@@ -139,10 +137,12 @@ jobs:
           if(oldArtifacts && oldArtifacts.length > 3) {
               oldArtifacts.length = KEEP_OLD;
 
+              // console.log("törölhető: ", oldArtifacts);
+
                // Delete
               for (let deleteItem of oldArtifacts) {
-                console.log("Name: ", deleteItem.name);
-                console.log("Created_1:", deleteItem.created_at);
+                console.log("Name:", deleteItem.name);
+                //console.log("Created_1:", deleteItem.created_at);
                 //await github.repos.deleteReleaseAsset({
                 //  asset_id: deleteItem.id,
                 //  owner,
