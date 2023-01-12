@@ -62,7 +62,7 @@ jobs:
           const today = new Date();
 
           // Nem maiak közül ennyit tartson meg
-          const KEEP_OLD = 5;
+          const KEEP_OLD = 2+3; // 2 = source-ok
 
           const listExistingArtifacts = (await github.repos.listReleaseAssets({
               owner,
@@ -143,11 +143,11 @@ jobs:
               for (let deleteItem of oldArtifacts) {
                   console.log("Name:", deleteItem.name);
                   //console.log("Created_1:", deleteItem.created_at);
-                  //await github.repos.deleteReleaseAsset({
-                  //  asset_id: deleteItem.id,
-                  //  owner,
-                  //  repo
-                  //});
+                  await github.repos.deleteReleaseAsset({
+                    asset_id: deleteItem.id,
+                    owner,
+                    repo
+                  });
               }
           }
 
