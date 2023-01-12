@@ -65,9 +65,9 @@ jobs:
           const KEEP_OLD = 5;
 
           const listExistingArtifacts = (await github.repos.listReleaseAssets({
-            owner,
-            repo,
-            release_id,
+              owner,
+              repo,
+              release_id,
           })).data;
 
           // --- MAIAK TÖRLÉSE (UTOLSÓ KIVÉTELÉVEL) ---
@@ -77,106 +77,106 @@ jobs:
           let listTodayArtifacts = listExistingArtifacts;
 
           // Maiak kiszedése
-          if(listTodayArtifacts && listTodayArtifacts.length > 1){
-           listTodayArtifacts = listTodayArtifacts.filter(item => {
-                itemDate = new Date(item.created_at);
-                return itemDate.getDate() === today.getDate() && 
-                  itemDate.getMonth() === today.getMonth() && 
-                  itemDate.getFullYear() === today.getFullYear();
-            });
+          if (listTodayArtifacts && listTodayArtifacts.length > 1) {
+              listTodayArtifacts = listTodayArtifacts.filter(item => {
+                  itemDate = new Date(item.created_at);
+                  return itemDate.getDate() === today.getDate() &&
+                      itemDate.getMonth() === today.getMonth() &&
+                      itemDate.getFullYear() === today.getFullYear();
+              });
           }
 
           // console.log("Maiak:", listTodayArtifacts);
 
           // Dátum szerinti rendezés
-          if(listTodayArtifacts && listTodayArtifacts.length > 1){
-            listTodayArtifacts.sort((a, b) => {
-                return a.created_at - b.created_at;
-            });
+          if (listTodayArtifacts && listTodayArtifacts.length > 1) {
+              listTodayArtifacts.sort((a, b) => {
+                  return a.created_at - b.created_at;
+              });
           }
 
           // Levágjuk a legfrisebb 1 db-ot, az maradjon meg mint latest előtti.
-          if(listTodayArtifacts && listTodayArtifacts.length > 0)listTodayArtifacts.length = (listTodayArtifacts.length - 1);
+          if (listTodayArtifacts && listTodayArtifacts.length > 0) listTodayArtifacts.length = (listTodayArtifacts.length - 1);
 
           // Maradék törölhető
-          if(listTodayArtifacts && listTodayArtifacts.length > 0){
-            for (let deleteItem of listTodayArtifacts) {
-              console.log("DELETE Name: ", deleteItem.name);
-              //console.log("DELETE Created_1:", deleteItem.created_at);
-              await github.repos.deleteReleaseAsset({
-                asset_id: deleteItem.id,
-                owner,
-                repo
-              });
-            }
+          if (listTodayArtifacts && listTodayArtifacts.length > 0) {
+              for (let deleteItem of listTodayArtifacts) {
+                  console.log("DELETE Name: ", deleteItem.name);
+                  //console.log("DELETE Created_1:", deleteItem.created_at);
+                  await github.repos.deleteReleaseAsset({
+                      asset_id: deleteItem.id,
+                      owner,
+                      repo
+                  });
+              }
           }
 
           // --- RÉGIEK TÖRLÉSE ---
-         console.log("OLD DELETE");
+          console.log("OLD DELETE");
 
           let oldArtifacts = listExistingArtifacts;
 
           // Régebbi mint maiak kiszedése
-          if(oldArtifacts && oldArtifacts.length > 1){
-            oldArtifacts = oldArtifacts.filter(item => {
-                itemDate = new Date(item.created_at);
-                return itemDate.getDate() !== today.getDate() || 
-                  itemDate.getMonth() !== today.getMonth() || 
-                  itemDate.getFullYear() !== today.getFullYear();
-            });
+          if (oldArtifacts && oldArtifacts.length > 1) {
+              oldArtifacts = oldArtifacts.filter(item => {
+                  itemDate = new Date(item.created_at);
+                  return itemDate.getDate() !== today.getDate() ||
+                      itemDate.getMonth() !== today.getMonth() ||
+                      itemDate.getFullYear() !== today.getFullYear();
+              });
           }
 
           // Rendezzük
-          if(oldArtifacts && oldArtifacts.length > 1){
-            oldArtifacts.sort((a, b) => {
-                return a.created_at - b.created_at;
-            });
+          if (oldArtifacts && oldArtifacts.length > 1) {
+              oldArtifacts.sort((a, b) => {
+                  return a.created_at - b.created_at;
+              });
           }
 
           // Ha több mint 3 régi van, akkor kitöröljük őket..
-          if(oldArtifacts && oldArtifacts.length > 3) {
+          if (oldArtifacts && oldArtifacts.length > 3) {
               oldArtifacts.length = KEEP_OLD;
 
-              // console.log("törölhető: ", oldArtifacts);
+              // console.log("törölhetö: ", oldArtifacts);
 
-               // Delete
+              // Delete
               for (let deleteItem of oldArtifacts) {
-                console.log("Name:", deleteItem.name);
-                //console.log("Created_1:", deleteItem.created_at);
-                //await github.repos.deleteReleaseAsset({
-                //  asset_id: deleteItem.id,
-                //  owner,
-                //  repo
-                //});
+                  console.log("Name:", deleteItem.name);
+                  //console.log("Created_1:", deleteItem.created_at);
+                  //await github.repos.deleteReleaseAsset({
+                  //  asset_id: deleteItem.id,
+                  //  owner,
+                  //  repo
+                  //});
               }
           }
 
           // --- FELTÖLTÉS ---
 
           for (let file of await fs.readdir('./dist')) {
-            if ([".", ".."].includes(file)) continue;
+              if ([".", ".."].includes(file)) continue;
 
-            console.log(`Uploading '${file}'...`);
-            let retry = 3;
-            while (retry++ > 0) {
-              try {
-                await github.repos.uploadReleaseAsset({
-                  owner, repo,
-                  release_id,
-                  name: file,
-                  data: await fs.readFile(`./dist/${file}`)
-                });
-                console.log(`Uploaded '${file}'.`);
-                break;
-              } catch(err) {
-                if (err.status >= 500 && retry > 0) {
-                  console.log(`Failed to upload artifact '${file}'. Retrying...`);
-                  continue;
-                }
-                console.error("Unable to upload asset", file, err);
-                break;
+              console.log(`Uploading '${file}'...`);
+              let retry = 3;
+              while (retry++ > 0) {
+                  try {
+                      await github.repos.uploadReleaseAsset({
+                          owner, repo,
+                          release_id,
+                          name: file,
+                          data: await fs.readFile(`./dist/${file}`)
+                      });
+                      console.log(`Uploaded '${file}'.`);
+                      break;
+                  } catch (err) {
+                      if (err.status >= 500 && retry > 0) {
+                          console.log(`Failed to upload artifact '${file}'. Retrying...`);
+                          continue;
+                      }
+                      console.error("Unable to upload asset", file, err);
+                      break;
+                  }
               }
-            }
           }
 
-          console.log("Done.");    
+          console.log("Done.");        
