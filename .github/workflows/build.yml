@@ -78,7 +78,7 @@ jobs:
 
           // Maiak kiszedése
           if(listTodayArtifacts && listTodayArtifacts.length > 1){
-           listTodayArtifacts = listTodayArtifacts.find(item => {
+           listTodayArtifacts = listTodayArtifacts.filter(item => {
                 itemDate = new Date(item.created_at);
                 return itemDate.getDate() === today.getDate() && 
                   itemDate.getMonth() === today.getMonth() && 
@@ -118,7 +118,7 @@ jobs:
 
           // Régebbi mint maiak kiszedése
           if(oldArtifacts && oldArtifacts.length > 1){
-            oldArtifacts = oldArtifacts.find(item => {
+            oldArtifacts = oldArtifacts.filter(item => {
                 itemDate = new Date(item.created_at);
                 return itemDate.getDate() !== today.getDate() || 
                   itemDate.getMonth() !== today.getMonth() || 
