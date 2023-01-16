@@ -133,7 +133,7 @@ jobs:
           }
 
           // Ha több mint 3 régi van, akkor kitöröljük őket..
-          if (oldArtifacts && oldArtifacts.length > 3) {
+          if (oldArtifacts && oldArtifacts.length > KEEP_OLD) {
               oldArtifacts.length = KEEP_OLD;
 
               // console.log("törölhetö: ", oldArtifacts);
