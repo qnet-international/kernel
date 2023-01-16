@@ -26,7 +26,6 @@ jobs:
     - name: Make
       run: |
         export
-        make rockchip_linux_defconfig
         make -j8
 
     - name: Create debs
