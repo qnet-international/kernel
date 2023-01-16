@@ -24,7 +24,7 @@ export ARCH=arm64
 export CROSS_COMPILE=/usr/local/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
  
 cd kernel
-make rockchip_linux_defconfig
+#make rockchip_linux_defconfig # Caution! This will overwrite all parameters in the .config file to the rockchip default!
 make menuconfig
 
 # RTC NOTES:
